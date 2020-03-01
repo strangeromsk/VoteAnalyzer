@@ -22,17 +22,19 @@ public class Loader
 
     public static void main(String[] args) throws Exception
     {
+        final long beforeParsing = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+
         String fileName = "res/data-18M.xml";
 
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        SAXParser parser = factory.newSAXParser();
-        XMLHandler handler = new XMLHandler();
-        parser.parse(new File(fileName),handler);
-        handler.printDuplicatedVoters();
+//        SAXParserFactory factory = SAXParserFactory.newInstance();
+//        SAXParser parser = factory.newSAXParser();
+//        XMLHandler handler = new XMLHandler();
+//        parser.parse(new File(fileName),handler);
+//        handler.printDuplicatedVoters();
 
-//        parseFile(fileName);
-//
-//        //Printing results
+        parseFile(fileName);
+
+        //Printing results
 //        System.out.println("Voting station work times: ");
 //        for(Integer votingStation : voteStationWorkTimes.keySet())
 //        {
@@ -48,6 +50,9 @@ public class Loader
 //                System.out.println("\t" + voter + " - " + count);
 //            }
 //        }
+        final long afterParsing = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+        final long diff = (afterParsing-beforeParsing)/1048576;
+        System.out.println("Memory consumption = " + diff + " MBs");
     }
 
     private static void parseFile(String fileName) throws Exception
