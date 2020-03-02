@@ -19,10 +19,12 @@ public class Loader
 
     private static HashMap<Integer, WorkTime> voteStationWorkTimes = new HashMap<>();
     private static HashMap<Voter, Integer> voterCounts = new HashMap<>();
+    private static Document doc;
 
     public static void main(String[] args) throws Exception
     {
         final long beforeParsing = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+        final long start = System.currentTimeMillis();
 
         String fileName = "res/data-18M.xml";
 
@@ -33,7 +35,9 @@ public class Loader
 //        handler.printDuplicatedVoters();
 
         parseFile(fileName);
+        //DBConnection.executeMultiInsert();
 
+        //DBConnection.printVoterCounts();
         //Printing results
 //        System.out.println("Voting station work times: ");
 //        for(Integer votingStation : voteStationWorkTimes.keySet())
@@ -50,16 +54,17 @@ public class Loader
 //                System.out.println("\t" + voter + " - " + count);
 //            }
 //        }
+        final long end = System.currentTimeMillis() - start;
         final long afterParsing = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         final long diff = (afterParsing-beforeParsing)/1048576;
-        System.out.println("Memory consumption = " + diff + " MBs");
+        System.err.println("Memory consumption = " + diff + " MBs\tTime duration = " + end);
     }
 
     private static void parseFile(String fileName) throws Exception
     {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
-        Document doc = db.parse(new File(fileName));
+        doc = db.parse(new File(fileName));
 
         findEqualVoters(doc);
         fixWorkTimes(doc);
@@ -77,10 +82,15 @@ public class Loader
             String name = attributes.getNamedItem("name").getNodeValue();
             Date birthDay = birthDayFormat.parse(attributes.getNamedItem("birthDay").getNodeValue());
 
+            //String birthDay = attributes.getNamedItem("birthDay").getNodeValue();
+
+            //DBConnection.countVoter(name, birthDay);
+
             Voter voter = new Voter(name, birthDay);
             Integer count = voterCounts.get(voter);
             voterCounts.put(voter, count == null ? 1 : count + 1);
         }
+        //DBConnection.executeMultiInsert();
     }
 
     private static void fixWorkTimes(Document doc) throws Exception
