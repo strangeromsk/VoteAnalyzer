@@ -24,7 +24,7 @@ public class Loader {
         final long beforeParsing = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         final long start = System.currentTimeMillis();
 
-        String fileName = "res/data-1572M.xml";
+        String fileName = "res/data-0.2M.xml";
 
         SAXParserFactory factory = SAXParserFactory.newInstance();
         SAXParser parser = factory.newSAXParser();
@@ -37,7 +37,7 @@ public class Loader {
         System.err.println("Memory consumption = " + diff + " MBs\tTime duration = " + end);
     }
 
-    private static void parseFile(String fileName) throws Exception {
+    public static void parseFile(String fileName) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         doc = db.parse(new File(fileName));

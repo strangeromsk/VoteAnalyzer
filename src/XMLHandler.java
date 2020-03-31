@@ -33,14 +33,8 @@ public class XMLHandler extends DefaultHandler {
                 int count = voterCounts.getOrDefault(voter, 0);
                 voterCounts.put(voter, count + 1);
             }
-            if (voterCounts.keySet().size() == 40000) {
-                String pattern = "yyyy-MM-dd";
-                DateFormat df = new SimpleDateFormat(pattern);
-                for (Voter voter : voterCounts.keySet()) {
-                    int count = voterCounts.get(voter);
-                    DBConnection.executeMultiInsert(voter.getName(), df.format(voter.getBirthDay()), count);
-                }
-                voterCounts.clear();
+            if (voterCounts.size() == 40000) {
+                insert();
             }
         } catch (ParseException | SQLException e) {
             e.printStackTrace();
@@ -48,19 +42,13 @@ public class XMLHandler extends DefaultHandler {
     }
 
     @Override
-    public void endElement(String uri, String localName, String qName) throws SAXException {
+    public void endElement(String uri, String localName, String qName) {
         if (!voterCounts.keySet().isEmpty()) {
-            String pattern = "yyyy-MM-dd";
-            DateFormat df = new SimpleDateFormat(pattern);
-            for (Voter voter : voterCounts.keySet()) {
-                int count = voterCounts.get(voter);
-                try {
-                    DBConnection.executeMultiInsert(voter.getName(), df.format(voter.getBirthDay()), count);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+            try {
+                insert();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            voterCounts.clear();
         }
         if (qName.equals("voter")) {
             voter = null;
@@ -70,18 +58,14 @@ public class XMLHandler extends DefaultHandler {
     public void insert() throws SQLException {
         String pattern = "yyyy-MM-dd";
         DateFormat df = new SimpleDateFormat(pattern);
-        voterCounts.keySet().forEach(e -> {
-            String name = e.getName();
-            String birthDate = df.format(e.getBirthDay());
-
-        });
-        DBConnection.executeMultiInsert(voter.getName(), df.format(voter.getBirthDay()), 1);
-
-//        for(Voter voter : voterCounts.keySet()){
-//            int count = voterCounts.get(voter);
-//            if(count > 1){
-//                System.out.println(voter.toString() + " - " + count);
-//            }
-//        }
+        for (Voter voter : voterCounts.keySet()) {
+            int count = voterCounts.get(voter);
+            try {
+                DBConnection.executeMultiInsert(voter.getName(), df.format(voter.getBirthDay()), count);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        voterCounts.clear();
     }
 }

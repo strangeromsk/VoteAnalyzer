@@ -37,16 +37,25 @@ public class DBConnection {
         return connection;
     }
 
-    public static void executeMultiInsert(String name, String birthDate, int count) throws SQLException {
-        String sql = "INSERT INTO voter_count(name, birthDate, `count`)" +
-                "VALUES('" + name + "', '" + birthDate + "', '" + count + "')";
-        DBConnection.getConnection().createStatement().execute(sql);
+    public static void executeMultiInsert(String name, String birthDate, int count) throws Exception {
+//        String sql = "INSERT INTO voter_count(name, birthDate, `count`)" +
+//                "VALUES('" + name + "', '" + birthDate + "', '" + count + "')";
+//        DBConnection.getConnection().createStatement().execute(sql);
+
+        Loader.parseFile("res/data-0.2M.xml");
+
 //        birthDate = birthDate.replace('.', '-');
 //        insertQuery.append((insertQuery.length() == 0 ? "" : ",") +
 //                "('" + name + "', '" + birthDate + "', 1)");
-//        String sql = "INSERT INTO voter_count(name, birthDate, `count`)" +
-//                "VALUES" + insertQuery.toString() +
-//                "ON DUPLICATE KEY UPDATE `count` = `count` + 1";
+        String sql = "INSERT INTO voter_count(name, birthDate, `count`)" +
+                "VALUES" + insertQuery.toString() +
+                "ON DUPLICATE KEY UPDATE `count` = `count` + 1";
+        DBConnection.getConnection().createStatement().execute(sql);
+//        if(insertQuery.length() == 1000){
+//            DBConnection.getConnection().createStatement().execute(sql);
+//            insertQuery = null;
+//        }
+
     }
 
     public static void countVoter(String name, String birthDay) throws SQLException {
