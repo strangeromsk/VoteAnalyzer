@@ -58,7 +58,7 @@ public class Loader {
 
             String birthDay = attributes.getNamedItem("birthDay").getNodeValue();
 
-            DBConnection.countVoter(name, birthDay);
+            //DBConnection.countVoter(name, birthDay, count);
 
 //            Voter voter = new Voter(name, birthDay);
 //            Integer count = voterCounts.get(voter);
