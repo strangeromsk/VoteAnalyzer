@@ -13,50 +13,23 @@ import java.util.HashMap;
 
 public class XMLHandler extends DefaultHandler {
 
-    private Voter voter;
-    private static SimpleDateFormat birthDayFormat = new SimpleDateFormat("yyyy.MM.dd");
-    private static HashMap<Voter, Integer> voterCounts;
-    public XMLHandler() {
-        voterCounts = new HashMap<>();
-    }
+    int limit = 5000000;
+    int number = 0;
 
     @Override
-    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        try {
-            if (qName.equals("voter") && voter == null) {
-                Date birthDay = birthDayFormat.parse(attributes.getValue("birthDay"));
-                voter = new Voter(attributes.getValue("name"), birthDay);
-            } else if (qName.equals("visit") && voter != null) {
-                int count = voterCounts.getOrDefault(voter, 0);
-                voterCounts.put(voter, count + 1);
-            }
-            DBConnection.countVoter();
-            if (DBConnection.getInsertQuery().length() == 400) {
-                DBConnection.executeMultiInsert();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void endElement(String uri, String localName, String qName) {
-        if (qName.equals("voter")) {
-            voter = null;
-        }
-    }
-
-    public void insert() throws SQLException {
-        String pattern = "yyyy-MM-dd";
-        DateFormat df = new SimpleDateFormat(pattern);
-        for (Voter voter : voterCounts.keySet()) {
-            //int count = voterCounts.get(voter);
+    public void startElement(String uri, String localName, String qName, Attributes attributes) {
+        if (qName.equals("voter") && number < limit) {
+            String name = attributes.getValue("name");
+            String birthDate = attributes.getValue("birthDay");
             try {
-                DBConnection.executeMultiInsert();
-            } catch (Exception e) {
+                DBConnection.insertVoter(name, birthDate);
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
+            number++;
         }
-        voterCounts.clear();
     }
+
+    @Override
+    public void endElement(String uri, String localName, String qName) {}
 }
